@@ -13,10 +13,15 @@
 								"\tln -s /pkg/warpsys.org/bootstrap/glibc/lib /lib",
 								"\tln -s /pkg/warpsys.org/bootstrap/busybox/bin/sh /bin/sh",
 								"\tln -s /pkg/warpsys.org/bootstrap/gcc/bin/cpp /lib/cpp",
-								"\tcd /src/*",
-								"    ./configure --prefix=/warpsys-placeholder-prefix ",
+								"\t",
+								"    ln -s /pkg/warpsys.org/bootstrap/gcc/bin/gcc /bin/cc",
+								"    ln -s /pkg/warpsys.org/bootstrap/gcc/bin/cpp /lib/cpp",
+								"    cd /src/*",
+								"    sh Configure -Dcc=/pkg/warpsys.org/bootstrap/gcc/bin/gcc -Dprefix=/warpsys-placeholder-prefix -Aldflags=-Wl,-rpath=XORIGIN/../lib -Aarflags=rvD -de",
 								"    make",
-								"    make DESTDIR=/out install"
+								"    make DESTDIR=/out install",
+								"    sed -i '0,/XORIGIN/{s/XORIGIN/$ORIGIN/}' /out/warpsys-placeholder-prefix/bin/*",
+								"    "
 							],
 							"interpreter": "/pkg/warpsys.org/bootstrap/busybox/bin/sh"
 						}
@@ -40,7 +45,7 @@
 						"/pkg/warpsys.org/bootstrap/sed": "catalog:warpsys.org/bootstrap/sed:v4.8:amd64",
 						"/pkg/warpsys.org/diffutils": "catalog:warpsys.org/diffutils:v3.8:amd64",
 						"/pkg/warpsys.org/findutils": "catalog:warpsys.org/findutils:v4.9.0:amd64",
-						"/src": "catalog:warpsys.org/bash:v5.1.16:src"
+						"/src": "catalog:warpsys.org/perl:v5.36.0:src"
 					},
 					"outputs": {
 						"out": {
@@ -61,9 +66,18 @@
 								"    cp /pkg/warpsys.org/bootstrap/glibc/lib/libc.so.6 /pack/lib",
 								"cp /pkg/warpsys.org/bootstrap/glibc/lib/libdl.so.2 /pack/lib",
 								"cp /pkg/warpsys.org/bootstrap/glibc/lib/libm.so.6 /pack/lib",
-								"mv /pack/bin/bash /pack/dynbin",
-								"cp /pkg/warpsys.org/bootstrap/ldshim/ldshim /pack/bin/bash",
-								"rm -rf /pack/lib/bash /pack/lib/pkgconfig /pack/include /pack/share",
+								"cp /pkg/warpsys.org/bootstrap/glibc/lib/libcrypt.so.1 /pack/lib",
+								"mv /pack/bin/perl /pack/dynbin",
+								"cp /pkg/warpsys.org/bootstrap/ldshim/ldshim /pack/bin/perl",
+								"mv /pack/bin/perl5.36.0 /pack/dynbin",
+								"cp /pkg/warpsys.org/bootstrap/ldshim/ldshim /pack/bin/perl5.36.0",
+								"sed -i \"s/\\$config_tag1 = '\\([^ ]\\+\\)*.*/\\$config_tag1 = '\\1'/\" /pack/bin/perlbug /pack/bin/perlthanks",
+								"    sed -i \"s/Configuration time:.*//\" /pack/lib/perl5/5.36.0/x86_64-linux/CORE/config.h /pack/lib/perl5/5.36.0/x86_64-linux/Config_heavy.pl",
+								"    sed -i \"s/cf_time='[^']\\+/cf_time='`date --date='@1262304000'`/\" /pack/lib/perl5/5.36.0/x86_64-linux/Config_heavy.pl",
+								"    sed -i \"s/Target system.*//\" /pack/lib/perl5/5.36.0/x86_64-linux/CORE/config.h /pack/lib/perl5/5.36.0/x86_64-linux/Config_heavy.pl",
+								"    sed -i \"s/myuname='.*/myuname='linux'/\" /pack/lib/perl5/5.36.0/x86_64-linux/Config_heavy.pl",
+								"    sed -i \"s/[[:digit:]]\\+.[[:digit:]]\\+.[[:digit:]]\\+-[[:digit:]]\\+/linux/\" /pack/lib/perl5/5.36.0/x86_64-linux/Errno.pm /pack/lib/perl5/5.36.0/x86_64-linux/CORE/config.h /pack/lib/perl5/5.36.0/x86_64-linux/Config_heavy.pl /pack/lib/perl5/5.36.0/x86_64-linux/Config.pm",
+								"    ",
 								"sed -i '0,/XORIGIN/{s/XORIGIN/$ORIGIN/}' /pack/dynbin/*"
 							],
 							"interpreter": "/pkg/warpsys.org/bootstrap/busybox/bin/sh"

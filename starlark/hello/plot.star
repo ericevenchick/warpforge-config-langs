@@ -1,11 +1,11 @@
-load("../lib.star", "plot")
-load("../lib.star", "catalog_input_str")
-load("../lib.star", "script_protoformula")
+load("warpsys.star", "plot")
+load("warpsys.star", "catalog_input_str")
+load("warpsys.star", "script_protoformula")
 
 step_run = script_protoformula(
     {
-        "/pkg/busybox": catalog_input_str("warpsys.org/busybox", "v1.35.0", "amd64-static"),
-        "/pkg/bash": catalog_input_str("warpsys.org/bash", "v5.1.16", "amd64"),
+        "/pkg/busybox": catalog_input_str(("warpsys.org/busybox", "v1.35.0", "amd64-static")),
+        "/pkg/bash": catalog_input_str(("warpsys.org/bash", "v5.1.16", "amd64")),
     }, 
     "/pkg/bash/bin/bash",
     """
@@ -15,4 +15,4 @@ step_run = script_protoformula(
     """
 )
 
-result = plot({"one": step_run})
+result = plot(steps={"one": step_run})

@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"strconv"
 
 	"go.starlark.net/lib/json"
@@ -10,8 +12,35 @@ import (
 
 func load(_ *starlark.Thread, module string) (starlark.StringDict, error) {
 	// todo detect cycles
+	wd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+
+	// find the module file by checking parent directories
+	// until the first match is found
+	file := filepath.Join(wd, module)
+	for {
+		_, err := os.Stat(file)
+		if err == nil {
+			// found it!
+			break
+		} else if os.IsNotExist(err) {
+			// file not found, check the parent dir
+			currentDir := filepath.Dir(file)
+			parentDir := filepath.Dir(currentDir)
+			file = filepath.Join(parentDir, module)
+		} else if file == "/"+module {
+			// hit root directory, fail
+			panic(fmt.Sprintf("failed to locate module %q", module))
+		} else {
+			// error doing stat, fail
+			panic(fmt.Sprintf("error locating module %q: %s", module, err))
+		}
+	}
+
 	thread := &starlark.Thread{Name: "module " + module, Load: load}
-	globals, err := starlark.ExecFile(thread, module, nil, nil)
+	globals, err := starlark.ExecFile(thread, file, nil, nil)
 
 	return globals, err
 }
