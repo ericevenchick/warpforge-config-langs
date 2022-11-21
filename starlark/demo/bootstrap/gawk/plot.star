@@ -1,7 +1,7 @@
-load("../../warpsys.star", "plot")
-load("../../warpsys.star", "catalog_input_str")
-load("../bootstrap.star", "bootstrap_build_step")
-load("../bootstrap.star", "bootstrap_pack_step")
+load("warpsys.star", "plot")
+load("warpsys.star", "catalog_input_str")
+load("bootstrap.star", "bootstrap_build_step")
+load("bootstrap.star", "bootstrap_pack_step")
 
 step_build = bootstrap_build_step(
     src=("warpsys.org/gawk", "v5.1.1", "src"),

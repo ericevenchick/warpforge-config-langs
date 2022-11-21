@@ -10,29 +10,25 @@ import (
 	"go.starlark.net/starlark"
 )
 
-func load(_ *starlark.Thread, module string) (starlark.StringDict, error) {
-	// todo detect cycles
-	wd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
+var basePath string
 
+func load(_ *starlark.Thread, module string) (starlark.StringDict, error) {
 	// find the module file by checking parent directories
 	// until the first match is found
-	file := filepath.Join(wd, module)
+	file := filepath.Join(basePath, module)
 	for {
 		_, err := os.Stat(file)
 		if err == nil {
 			// found it!
 			break
+		} else if file == "/"+module {
+			// hit root directory, fail
+			panic(fmt.Sprintf("failed to locate module %q", module))
 		} else if os.IsNotExist(err) {
 			// file not found, check the parent dir
 			currentDir := filepath.Dir(file)
 			parentDir := filepath.Dir(currentDir)
 			file = filepath.Join(parentDir, module)
-		} else if file == "/"+module {
-			// hit root directory, fail
-			panic(fmt.Sprintf("failed to locate module %q", module))
 		} else {
 			// error doing stat, fail
 			panic(fmt.Sprintf("error locating module %q: %s", module, err))
@@ -46,9 +42,10 @@ func load(_ *starlark.Thread, module string) (starlark.StringDict, error) {
 }
 
 // Execute Starlark program in a file.
-func main() {
+func execFile(path string) {
+	basePath = filepath.Dir(path)
 	thread := &starlark.Thread{Name: "my thread", Load: load}
-	globals, err := starlark.ExecFile(thread, "plot.star", nil, starlark.StringDict{"json": json.Module})
+	globals, err := starlark.ExecFile(thread, path, nil, starlark.StringDict{"json": json.Module})
 	if err != nil {
 		panic(err)
 	}
@@ -80,4 +77,12 @@ func main() {
 
 	// print the result
 	fmt.Println(plotJson)
+}
+
+func main() {
+	if len(os.Args) == 2 {
+		execFile(os.Args[1])
+	} else {
+		fmt.Printf("usage: %s [input file]\n", os.Args[0])
+	}
 }
