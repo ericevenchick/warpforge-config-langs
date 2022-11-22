@@ -40,11 +40,13 @@ def gnu_build_step(src, script, extra_inputs=[]):
     inputs = {}
     pathstr = "literal:"
     cpathstr = "literal:"
+    ldpathstr = "literal:"
     for dep in build_deps:
         path = "/pkg/" + dep[0]
         inputs[path] = catalog_input_str(dep)
         pathstr = pathstr + path + "/bin:"
         cpathstr = cpathstr + path + "/include:"
+        ldpathstr = ldpathstr + path + "/lib:"
     cpathstr = cpathstr + "/pkg/warpsys.org/bootstrap/glibc/include/x86_64-linux-gnu"
 
     # add the source catalog input 
@@ -53,14 +55,14 @@ def gnu_build_step(src, script, extra_inputs=[]):
     # add the dynamic linker (ld) to /lib64
     inputs["/lib64"] = catalog_input_str(("warpsys.org/bootstrap/glibc", "v2.35", "ld-amd64"))
 
-
     # set up the environment vars for the build
     inputs["$PATH"] = pathstr
     inputs["$CPATH"] = cpathstr
+    inputs["$LD_LIBRARY_PATH"] = ldpathstr 
     inputs["$SOURCE_DATE_EPOCH"] = "literal:1262304000"
     inputs["$LDFLAGS"] = "literal:-Wl,-rpath=XORIGIN/../lib"
     inputs["$ARFLAGS"] = "literal:rvD"
-
+    
     # this script runs before the build script to set up the environment
     setup_script = """mkdir -p /bin /tmp /prefix /usr/include/
 	ln -s /pkg/warpsys.org/bootstrap/glibc/lib /prefix/lib

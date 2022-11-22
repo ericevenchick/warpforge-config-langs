@@ -5,20 +5,15 @@ load("warpsys.star", "zapp_pack_step")
 
 step_build = gnu_build_step(
     src=("warpsys.org/python", "v3.10.4", "src"),
-    script="""mkdir -p /usr/lib/x86_64-linux-gnu /usr/include
-    export CPATH=$CPATH:/pkg/warpsys.org/zlib/include
-    export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/pkg/warpsys.org/zlib/lib/pkgconfig
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/pkg/warpsys.org/zlib/lib/
+    script="""mkdir -p /usr/lib/x86_64-linux-gnu
     export CPPFLAGS=-I/pkg/warpsys.org/zlib/include
     cp -r /pkg/warpsys.org/zlib/lib/* /usr/lib/x86_64-linux-gnu
-    cp -r /pkg/warpsys.org/zlib/include/* /usr/include
     cd /src/*
     ./configure --prefix=/warpsys-placeholder-prefix 
     make
     make DESTDIR=/out install""",
     extra_inputs=[
         ("warpsys.org/zlib", "v1.2.13", "amd64"),
-        ("warpsys.org/pkg-config", "v0.29.2", "amd64"),
     ])
 
 step_pack = zapp_pack_step(
