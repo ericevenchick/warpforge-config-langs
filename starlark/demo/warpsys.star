@@ -19,7 +19,7 @@ def script_protoformula(inputs, interp, script):
             "outputs": {}}}
     return protoformula
 
-def gnu_build_step(src, script):
+def gnu_build_step(src, script, extra_inputs=[]):
     # define the default deps for building
     build_deps = [
 	    ("warpsys.org/bootstrap/glibc", "v2.35", "amd64"),
@@ -34,7 +34,7 @@ def gnu_build_step(src, script):
 		("warpsys.org/bootstrap/gawk", "v5.1.1", "amd64"),
 		("warpsys.org/findutils", "v4.9.0", "amd64"),
 		("warpsys.org/diffutils", "v3.8", "amd64"),
-    ]    
+    ] + extra_inputs
 
     # build our input map, $PATH, and $CPATH based on the deps 
     inputs = {}
@@ -82,14 +82,14 @@ def gnu_build_step(src, script):
     }}
 
 
-def zapp_pack_step(binaries, libraries=[], extra_script=""):
+def zapp_pack_step(binaries, libraries=[], extra_script="", extra_inputs=[]):
     # list of dependencies needed for packing
     pack_deps = [
 		("warpsys.org/bootstrap/sed", "v4.8", "amd64"),
 	    ("warpsys.org/bootstrap/busybox", "v1.35.0", "amd64"),
 	    ("warpsys.org/bootstrap/glibc", "v2.35", "amd64"),
 	    ("warpsys.org/bootstrap/ldshim", "v1.0", "amd64"),
-    ]    
+    ] + extra_inputs    
 
     # create input map and $PATH
     inputs = {}

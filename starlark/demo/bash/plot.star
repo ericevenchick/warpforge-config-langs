@@ -1,7 +1,7 @@
-load("../warpsys.star", "plot")
-load("../warpsys.star", "catalog_input_str")
-load("../warpsys.star", "gnu_build_step")
-load("../warpsys.star", "zapp_pack_step")
+load("warpsys.star", "plot")
+load("warpsys.star", "catalog_input_str")
+load("warpsys.star", "gnu_build_step")
+load("warpsys.star", "zapp_pack_step")
 
 step_build = gnu_build_step(
     src=("warpsys.org/bash", "v5.1.16", "src"),
